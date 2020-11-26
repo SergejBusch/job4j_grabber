@@ -24,6 +24,7 @@ public class SqlRuParse {
             for (Element td : row) {
                 Element href = td.child(0);
                 System.out.println(href.attr("href"));
+                System.out.println(sqlRuParse.loadPostDetails(href.attr("href")));
                 System.out.println(href.text());
                 System.out.println(dates.get(i).text());
                 System.out.println(Date.valueOf(sqlRuParse
@@ -65,5 +66,28 @@ public class SqlRuParse {
         map.put("ноя", LocalDate.now().withMonth(11));
         map.put("дек", LocalDate.now().withMonth(12));
         return map.get(monthOrDay);
+    }
+
+    private String loadPostDetails(String url) throws Exception {
+        Document doc = Jsoup.connect(url).get();
+        Elements row = doc.select(".msgBody");
+
+        //вариант 1
+        StringBuilder lines = new StringBuilder();
+        String strRegEx = "<[^>]*>";
+        for (var e : row.get(1).childNodes()) {
+            final String trim = e.toString().replaceAll(strRegEx, "").trim();
+            if (e.toString().startsWith("<b>")) {
+                lines.append(trim);
+            } else if (e.toString().startsWith("<br")) {
+                lines.append(System.lineSeparator());
+            } else {
+                lines.append(trim);
+            }
+        }
+        return lines.toString();
+
+        //вариант 2, в одну строчку
+//      return row.get(1).text();
     }
 }
