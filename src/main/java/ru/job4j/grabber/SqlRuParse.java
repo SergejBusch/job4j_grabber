@@ -13,8 +13,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SqlRuParse implements Parse {
+    private static final Map<String, LocalDate> MOTHS_AND_DAYS = new HashMap<>();
+
+    public SqlRuParse() {
+        fillMap();
+    }
+
     public static void main(String[] args) {
         var sqlRuParse = new SqlRuParse();
         List<Post> list = sqlRuParse.list("https://www.sql.ru/forum/job-offers");
@@ -30,34 +37,32 @@ public class SqlRuParse implements Parse {
     private LocalDate convertDate(String date) {
         String[] dateParts = date.split(",")[0].split(" ");
         if (dateParts.length > 1) {
-            var tempDate = dateMap(dateParts[1]);
+            var tempDate = MOTHS_AND_DAYS.get(dateParts[1]);
             Year year = Year.parse(dateParts[2], DateTimeFormatter.ofPattern("yy"));
             tempDate = tempDate
                     .withYear(year.getValue())
                     .withDayOfMonth(Integer.parseInt(dateParts[0]));
             return tempDate;
         } else {
-            return dateMap(dateParts[0]);
+            return MOTHS_AND_DAYS.get(dateParts[0]);
         }
     }
 
-    private LocalDate dateMap(String monthOrDay) {
-        var map = new HashMap<String, LocalDate>();
-        map.put("сегодня", LocalDate.now());
-        map.put("вчера", LocalDate.now().minusDays(1));
-        map.put("янв", LocalDate.now().withMonth(1));
-        map.put("фев", LocalDate.now().withMonth(2));
-        map.put("мар", LocalDate.now().withMonth(3));
-        map.put("апр", LocalDate.now().withMonth(4));
-        map.put("май", LocalDate.now().withMonth(5));
-        map.put("июн", LocalDate.now().withMonth(6));
-        map.put("июл", LocalDate.now().withMonth(7));
-        map.put("авг", LocalDate.now().withMonth(8));
-        map.put("сен", LocalDate.now().withMonth(9));
-        map.put("окт", LocalDate.now().withMonth(10));
-        map.put("ноя", LocalDate.now().withMonth(11));
-        map.put("дек", LocalDate.now().withMonth(12));
-        return map.get(monthOrDay);
+    private void fillMap() {
+        MOTHS_AND_DAYS.put("сегодня", LocalDate.now());
+        MOTHS_AND_DAYS.put("вчера", LocalDate.now().minusDays(1));
+        MOTHS_AND_DAYS.put("янв", LocalDate.now().withMonth(1));
+        MOTHS_AND_DAYS.put("фев", LocalDate.now().withMonth(2));
+        MOTHS_AND_DAYS.put("мар", LocalDate.now().withMonth(3));
+        MOTHS_AND_DAYS.put("апр", LocalDate.now().withMonth(4));
+        MOTHS_AND_DAYS.put("май", LocalDate.now().withMonth(5));
+        MOTHS_AND_DAYS.put("июн", LocalDate.now().withMonth(6));
+        MOTHS_AND_DAYS.put("июл", LocalDate.now().withMonth(7));
+        MOTHS_AND_DAYS.put("авг", LocalDate.now().withMonth(8));
+        MOTHS_AND_DAYS.put("сен", LocalDate.now().withMonth(9));
+        MOTHS_AND_DAYS.put("окт", LocalDate.now().withMonth(10));
+        MOTHS_AND_DAYS.put("ноя", LocalDate.now().withMonth(11));
+        MOTHS_AND_DAYS.put("дек", LocalDate.now().withMonth(12));
     }
 
     @Override
