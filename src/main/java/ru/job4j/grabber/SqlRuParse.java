@@ -5,34 +5,26 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class SqlRuParse {
-    public static void main(String[] args) throws Exception {
+public class SqlRuParse implements Parse {
+    public static void main(String[] args) {
         var sqlRuParse = new SqlRuParse();
-        for (int siteNumber = 1; siteNumber < 6; siteNumber++) {
-            String adress = "https://www.sql.ru/forum/job-offers";
-            adress = siteNumber > 1 ? adress + "/" + siteNumber : adress;
-            Document doc = Jsoup.connect(adress).get();
-            Elements row = doc.select(".postslisttopic");
-            Elements dates = doc.select(".altCol");
-            int i = 1;
-            for (Element td : row) {
-                Element href = td.child(0);
-                System.out.println(href.attr("href"));
-                System.out.println(sqlRuParse.loadPostDetails(href.attr("href")));
-                System.out.println(href.text());
-                System.out.println(dates.get(i).text());
-                System.out.println(Date.valueOf(sqlRuParse
-                        .convertDate(dates.get(i).text())));
-                i += 2;
-            }
+        List<Post> list = sqlRuParse.list("https://www.sql.ru/forum/job-offers");
+        for (Post post : list) {
+            System.out.println(post.getTitle());
+            System.out.println(post.getUrl());
+            System.out.println(post.getDate());
+            System.out.println(post.getDetail());
+            System.out.println("------------------------------");
         }
-
     }
 
     private LocalDate convertDate(String date) {
@@ -68,26 +60,56 @@ public class SqlRuParse {
         return map.get(monthOrDay);
     }
 
-    private String loadPostDetails(String url) throws Exception {
-        Document doc = Jsoup.connect(url).get();
-        Elements row = doc.select(".msgBody");
-
-        //вариант 1
-        StringBuilder lines = new StringBuilder();
-        String strRegEx = "<[^>]*>";
-        for (var e : row.get(1).childNodes()) {
-            final String trim = e.toString().replaceAll(strRegEx, "").trim();
-            if (e.toString().startsWith("<b>")) {
-                lines.append(trim);
-            } else if (e.toString().startsWith("<br")) {
-                lines.append(System.lineSeparator());
-            } else {
-                lines.append(trim);
+    @Override
+    public List<Post> list(String link) {
+        var list = new ArrayList<Post>();
+        for (int siteNumber = 1; siteNumber < 6; siteNumber++) {
+            String address = link;
+            address = siteNumber > 1 ? address + "/" + siteNumber : address;
+            try {
+                Document doc = Jsoup.connect(address).get();
+                Elements row = doc.select(".postslisttopic");
+                Elements dates = doc.select(".altCol");
+                int i = 1;
+                for (Element td : row) {
+                    Element href = td.child(0);
+                    Post post = detail(href.attr("href"));
+                    post.setUrl(href.attr("href"));
+                    post.setTitle(href.text());
+                    post.setDate(Date.valueOf(convertDate(dates.get(i).text())));
+                    i += 2;
+                    list.add(post);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        return lines.toString();
-
-        //вариант 2, в одну строчку
-//      return row.get(1).text();
+        return list;
     }
+
+    @Override
+    public Post detail(String link) {
+        var post = new Post();
+        try {
+            Document doc = Jsoup.connect(link).get();
+            Elements row = doc.select(".msgBody");
+            StringBuilder lines = new StringBuilder();
+            String strRegEx = "<[^>]*>";
+            for (var e : row.get(1).childNodes()) {
+                final String trim = e.toString().replaceAll(strRegEx, "").trim();
+                if (e.toString().startsWith("<b>")) {
+                    lines.append(trim);
+                } else if (e.toString().startsWith("<br")) {
+                    lines.append(System.lineSeparator());
+                } else {
+                    lines.append(trim);
+                }
+            }
+            post.setDetail(lines.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return post;
+    }
+
 }
