@@ -70,7 +70,7 @@ public class SqlRuParse implements Parse {
         var list = new ArrayList<Post>();
         for (int siteNumber = 1; siteNumber < 6; siteNumber++) {
             String address = link;
-            address = siteNumber > 1 ? address + "/" + siteNumber : address;
+            address += "/" + siteNumber;
             try {
                 Document doc = Jsoup.connect(address).get();
                 Elements row = doc.select(".postslisttopic");
