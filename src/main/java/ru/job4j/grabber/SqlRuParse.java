@@ -34,7 +34,7 @@ public class SqlRuParse implements Parse {
         }
     }
 
-    private LocalDate convertDate(String date) {
+    private Date convertDate(String date) {
         String[] dateParts = date.split(",")[0].split(" ");
         if (dateParts.length > 1) {
             var tempDate = MOTHS_AND_DAYS.get(dateParts[1]);
@@ -42,9 +42,9 @@ public class SqlRuParse implements Parse {
             tempDate = tempDate
                     .withYear(year.getValue())
                     .withDayOfMonth(Integer.parseInt(dateParts[0]));
-            return tempDate;
+            return Date.valueOf(tempDate);
         } else {
-            return MOTHS_AND_DAYS.get(dateParts[0]);
+            return Date.valueOf(MOTHS_AND_DAYS.get(dateParts[0]));
         }
     }
 
@@ -81,7 +81,7 @@ public class SqlRuParse implements Parse {
                     Post post = detail(href.attr("href"));
                     post.setUrl(href.attr("href"));
                     post.setTitle(href.text());
-                    post.setDate(Date.valueOf(convertDate(dates.get(i).text())));
+                    post.setDate(convertDate(dates.get(i).text()));
                     i += 2;
                     list.add(post);
                 }
