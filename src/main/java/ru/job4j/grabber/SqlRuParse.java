@@ -98,19 +98,7 @@ public class SqlRuParse implements Parse {
         try {
             Document doc = Jsoup.connect(link).get();
             Elements row = doc.select(".msgBody");
-            StringBuilder lines = new StringBuilder();
-            String strRegEx = "<[^>]*>";
-            for (var e : row.get(1).childNodes()) {
-                final String trim = e.toString().replaceAll(strRegEx, "").trim();
-                if (e.toString().startsWith("<b>")) {
-                    lines.append(trim);
-                } else if (e.toString().startsWith("<br")) {
-                    lines.append(System.lineSeparator());
-                } else {
-                    lines.append(trim);
-                }
-            }
-            post.setDetail(lines.toString());
+            post.setDetail(row.get(1).text());
         } catch (IOException e) {
             e.printStackTrace();
         }
