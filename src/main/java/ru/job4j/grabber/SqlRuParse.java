@@ -26,7 +26,7 @@ public class SqlRuParse implements Parse {
         var sqlRuParse = new SqlRuParse();
         List<Post> list = sqlRuParse.list("https://www.sql.ru/forum/job-offers");
         for (Post post : list) {
-            System.out.println(post.getTitle());
+            System.out.println(post.getName());
             System.out.println(post.getUrl());
             System.out.println(post.getDate());
             System.out.println(post.getDetail());
@@ -80,7 +80,7 @@ public class SqlRuParse implements Parse {
                     Element href = td.child(0);
                     Post post = detail(href.attr("href"));
                     post.setUrl(href.attr("href"));
-                    post.setTitle(href.text());
+                    post.setName(href.text());
                     post.setDate(convertDate(dates.get(i).text()));
                     i += 2;
                     list.add(post);
