@@ -4,6 +4,6 @@ create schema aggregator
                                      id serial primary key,
                                      name varchar(2000),
                                      text text,
-                                     lint varchar(2000),
+                                     link varchar(2000) UNIQUE,
                                      created date
     )
