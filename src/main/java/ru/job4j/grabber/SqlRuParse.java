@@ -68,7 +68,7 @@ public class SqlRuParse implements Parse {
     @Override
     public List<Post> list(String link) {
         var list = new ArrayList<Post>();
-        for (int siteNumber = 1; siteNumber < 6; siteNumber++) {
+        for (int siteNumber = 1; siteNumber < 2; siteNumber++) {
             String address = link;
             address += "/" + siteNumber;
             try {
