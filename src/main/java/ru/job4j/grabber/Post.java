@@ -81,6 +81,16 @@ public class Post {
         result = 31 * result + date.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Post{"
+                + "name='" + name + '\''
+                + ", detail='" + detail + '\''
+                + ", url='" + url + '\''
+                + ", date=" + date
+                + '}';
+    }
 }
 
 
